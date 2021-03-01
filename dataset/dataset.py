@@ -26,7 +26,7 @@ class TextToSpeechDatasetCollection():
         validation_file (string, default 'val.txt'): Relative path to the meta-file of the validation set.
         test_file (string, default None): Relative path to the meta-file of the test set. Set None to ignore the test set.
     """
-    def __init__(self, dataset_root_dir, training_file="train.txt", validation_file="val.txt", test_file=None):
+    def __init__(self, dataset_root_dir, training_file="train.txt", validation_file="val.txt", test_file="test.txt"):
         
         # create training set
         train_full_path = os.path.join(dataset_root_dir, training_file)
@@ -94,10 +94,15 @@ class TextToSpeechDataset(torch.utils.data.Dataset):
                     'text': line_tokens[6],
                     'phonemes': line_tokens[7]
                 }
+                #print(hp.languages)
+                #print(item['language'])
                 if item['language'] in hp.languages:
+                    #print("uniq speakers {0} \nline_token[1] {1} \t".format(item['language'],line_tokens[1]))
                     if line_tokens[1] not in unique_speakers_set:
                         unique_speakers_set.add(line_tokens[1])
                         self.unique_speakers.append(line_tokens[1])
+                        #print("item is: ", item)
+                        #print("speakers: ", unique_speakers_set)
                     self.items.append(item)
 
         # clean text with basic stuff -- multiple spaces, case sensitivity and punctuation
@@ -144,7 +149,9 @@ class TextToSpeechDataset(torch.utils.data.Dataset):
 
         # load or compute spectrogram
         if hp.cache_spectrograms:
+            #path = '/content/drive/MyDriv/speech_project'
             full_spec_path = os.path.join(self.root_dir, spectrogram_path)
+            #full_spec_path = os.path.join(path, spectrogram_path)
             spectrogram = np.load(full_spec_path)
         else:
             full_audio_path = os.path.join(self.root_dir, audio_path)

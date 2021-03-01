@@ -10,7 +10,7 @@ class Params:
     """
     
     epochs = 300                         # training epochs
-    batch_size = 52                      # batch size during training (is parallelization is True, each GPU has batch_size // num_gpus examples)
+    batch_size = 8                      # batch size during training (is parallelization is True, each GPU has batch_size // num_gpus examples)
                                          # if using encoder_type 'convolutional' or 'generated', should be divisible by the number of languages 
     learning_rate = 1e-3                 # starting learning rate
     learning_rate_decay = 0.5            # decay multiplier used by step learning rate scheduler (use 0.5 for halving)
@@ -30,16 +30,16 @@ class Params:
     teacher_forcing = 1.0                # ratio of ground-truth frames, used if constant_teacher_forcing is True
     teacher_forcing_steps = 100000       # used if constant_teacher_forcing is False, cosine decay spans this number of trainig steps starting at teacher_forcing_start_steps
     teacher_forcing_start_steps = 50000  # number of training steps after which the teacher forcing decay starts 
-    checkpoint_each_epochs = 10          # save a checkpoint every this number epochs
+    checkpoint_each_epochs = 1          # save a checkpoint every this number epochs
     parallelization = True               # if True, DataParallel (parallel batch) is used, supports any number of GPUs
 
     """
     ******************* DATASET SPECIFICATION *******************
     """
     
-    dataset = "ljspeech"                 # one of: css10, ljspeech, vctk, my_blizzard, my_common_voice, mailabs, must have implementation in loaders.py
+    dataset = "wav_data"                 # one of: css10, ljspeech, vctk, my_blizzard, my_common_voice, mailabs, must have implementation in loaders.py
     cache_spectrograms = True            # if True, during iterating the dataset, it first tries to load spectrograms (mel or linear) from cached files 
-    languages = ['en-us']                # list of lnguages which will be loaded from the dataset, codes should correspond to 
+    languages = ['ar']                # list of lnguages which will be loaded from the dataset, codes should correspond to 
                                          # espeak format (see 'phonemize --help) in order support the converion to phonemes
     balanced_sampling = False            # enables balanced sampling per languages (not speakers), multi_language must be True
     perfect_sampling = False             # used just if balanced_sampling is True, should be used together with encoder_type 'convolutional' or 'generated'
@@ -50,7 +50,8 @@ class Params:
     *************************** TEXT ****************************
     """
 
-    characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '    # supported input alphabet, used for computation of character embeddings
+    characters = " أبتثجحخدذرزسشصضطظعغفقكلمنهويئءؤةاإآ"    
+    # supported input alphabet, used for computation of character embeddings
     # for lower-case russian, greek, latin and pinyin use " abcdefghijklmnopqrstuvwxyzçèéßäöōǎǐíǒàáǔüèéìūòóùúāēěīâêôûñőűабвгдежзийклмнопрстуфхцчшщъыьэюяё"
     case_sensitive = True                # if False, all characters are lowered before usage 
     remove_multiple_wspaces = True       # if True, multiple whitespaces, leading and trailing whitespaces, etc. are removed
@@ -59,7 +60,7 @@ class Params:
     punctuations_in  = '\'-'             # punctuation which can occur inside a word, so whitespaces do not have to be present
     use_phonemes = False                 # phonemes are valid only if True, model uses phonemes instead of characters
     # all phonemes of IPA: 'iyɨʉɯuɪʏʊeøɘəɵɤoɛœɜɞʌɔæɐaɶɑɒᵻʘɓǀɗǃʄǂɠǁʛpbtdʈɖcɟkɡqɢʔɴŋɲɳnɱmʙrʀⱱɾɽɸβfvθðszʃʒʂʐçʝxɣχʁħʕhɦɬɮʋɹɻjɰlɭʎʟˈˌːˑʍwɥʜʢʡɕʑɺɧ ɚ˞ɫ'
-    phonemes = 'ɹɐpbtdkɡfvθðszʃʒhmnŋlrwjeəɪɒuːɛiaʌʊɑɜɔx '   # supported input phonemes, used if use_phonemes is True
+    phonemes = 'iyɨʉɯuɪʏʊeøɘəɵɤoɛœɜɞʌɔæɐaɶɑɒᵻʘɓǀɗǃʄǂɠǁʛpbtdʈɖcɟkɡqɢʔɴŋɲɳnɱmʙrʀⱱɾɽɸβfvθðszʃʒʂʐçʝxɣχʁħʕhɦɬɮʋɹɻjɰlɭʎʟˈˌːˑʍwɥʜʢʡɕʑɺɧ ɚ˞ɫ '   # supported input phonemes, used if use_phonemes is True
 
     """
     ******************** PARAMETERS OF MODEL ********************
@@ -103,7 +104,7 @@ class Params:
     cbhg_highway_dimension = 128         # used if predict_linear is True
     cbhg_rnn_dim = 128                   # used if predict_linear is True
     cbhg_dropout = 0.0                   # used if predict_linear is True
-    multi_speaker = False                # if True, multi-speaker model is used, speaker embeddings are concatenated to encoder outputs
+    multi_speaker = True                # if True, multi-speaker model is used, speaker embeddings are concatenated to encoder outputs
     multi_language = False               # if True, multi-lingual model is used, language embeddings are concatenated to encoder outputs
     speaker_embedding_dimension = 32     # used if multi_speaker is True, size of the speaker embedding
     language_embedding_dimension = 4     # used if multi_language is True, size of the language embedding
@@ -122,7 +123,7 @@ class Params:
     ******************** PARAMETERS OF AUDIO ********************
     """
 
-    sample_rate = 22050                  # sample rate of source .wavs, used while computing spectrograms, MFCCs, etc.
+    sample_rate = 16000                  # sample rate of source .wavs, used while computing spectrograms, MFCCs, etc.
     num_fft = 1102                       # number of frequency bins used during computation of spectrograms
     num_mels = 80                        # number of mel bins used during computation of mel spectrograms
     num_mfcc = 13                        # number of MFCCs, used just for MCD computation (during training)
